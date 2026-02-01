@@ -1,0 +1,34 @@
+# Global/Root ignores
+.DS_Store
+node_modules/
+.vscode/
+
+# Python / Backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Backend Environment Variables
+backend/.env
+backend/.env.*
+
+# Frontend 
+# (Frontend has its own .gitignore, but good to double exclude at root if valid)
+frontend/.env.local
+frontend/.env
+frontend/node_modules/
+frontend/.next/
+
+# Local Test Files & Large Assets
+*.mp4
+*.video
+*.log
+test_video_upload.py
+backend/large_test.video
