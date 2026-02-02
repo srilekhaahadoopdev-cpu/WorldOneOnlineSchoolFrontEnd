@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/utils/supabase-debug';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import CourseActionButtons from '@/components/courses/CourseActionButtons';
+import CurriculumList from '@/components/courses/CurriculumList';
 
 // Define the Course interface based on our database schema
 interface Course {
@@ -38,28 +40,36 @@ interface CourseWithContent extends Course {
 
 export const revalidate = 0; // Ensure dynamic data fetch to reflect updates immediately
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (
+    process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}/api/v1`
+        : 'http://127.0.0.1:8002/api/v1'
+);
 
 import { createClient } from '@/lib/supabase/server';
 
 async function getCourse(slug: string): Promise<CourseWithContent | null> {
-    const cleanSlug = decodeURIComponent(slug).toLowerCase().trim();
+    const cleanSlug = slug.trim();
 
     try {
         const res = await fetch(`${API_URL}/courses/slug/${cleanSlug}`, {
-            cache: 'no-store', // Always fetch fresh data for now
+            cache: 'no-store',
             next: { revalidate: 0 }
         });
 
         if (!res.ok) {
+            const errorText = await res.text();
+            console.error(`❌ Backend returned ${res.status}: ${errorText} for slug: ${cleanSlug}`);
             if (res.status === 404) return null;
-            console.error(`Failed to fetch course: ${res.statusText}`);
             return null;
         }
 
-        return await res.json();
+        const data = await res.json();
+        console.log(`✅ Successfully fetched course: ${data.title}`);
+        return data;
     } catch (error) {
-        console.error("Error fetching course:", error);
+        console.error("❌ Network error fetching course from backend:", error);
+        console.error("Make sure the backend is running at:", API_URL);
         return null;
     }
 }
@@ -88,23 +98,42 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     const isGradient = !course.thumbnail_url?.startsWith('http');
     const gradientClass = isGradient ? course.thumbnail_url : '';
 
-    // Check for admin role
+    // Check authentication and enrollment
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     let isAdmin = false;
+    let isEnrolled = false;
 
     if (user) {
-        // Check metadata first (faster)
+        // Check Admin
         if (user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'instructor') {
             isAdmin = true;
         } else {
-            // Fallback to profile (safe)
             const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
             if (profile?.role === 'admin' || profile?.role === 'instructor') {
                 isAdmin = true;
             }
         }
+
+        // Check Enrollment
+        const { data: enrollment } = await supabase.from('enrollments').select('id').eq('user_id', user.id).eq('course_id', course.id).single();
+        if (enrollment) {
+            isEnrolled = true;
+        }
     }
+
+    // Filter modules for display if not enrolled/admin
+    const visibleModules = (isAdmin || isEnrolled)
+        ? course.modules
+        : course.modules.slice(0, 2).map(m => ({
+            ...m,
+            lessons: m.lessons.slice(0, 3)
+        }));
+
+    const showFullCurriculum = isAdmin || isEnrolled;
+    // ... existing return ...
+    // Update the mapping to use visibleModules and handle clicks
+
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
@@ -138,20 +167,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         <p className="text-xl text-slate-100 mb-8 leading-relaxed drop-shadow-sm">
                             {course.description}
                         </p>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                            <Button size="lg" className="bg-brand-gold hover:bg-yellow-500 text-deep-navy font-bold px-8 w-full sm:w-auto shadow-lg shadow-brand-gold/20">
-                                {course.price > 0 ? `Enroll for $${course.price}` : 'Enroll for Free'}
-                            </Button>
-                            <Link href={`/courses/${slug}/learn`}>
-                                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 w-full sm:w-auto">
-                                    ▶ Start Learning
-                                </Button>
-                            </Link>
-                            <span className="text-slate-200 text-sm font-medium">
-                                <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>
-                                Instant Access
-                            </span>
-                        </div>
+                        <CourseActionButtons course={course} />
                     </div>
                 </div>
             </div>
@@ -199,48 +215,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                                 </span>
                             </div>
 
-                            <div className="space-y-4">
-                                {(course.modules && course.modules.length > 0) ? (
-                                    course.modules.map((mod) => (
-                                        <div key={mod.id} className="border border-slate-200 rounded-xl overflow-hidden">
-                                            <div className="bg-slate-50 p-4 font-medium text-deep-navy">
-                                                {mod.title}
-                                            </div>
-                                            <div className="bg-white divide-y divide-slate-50">
-                                                {mod.lessons.map(lesson => (
-                                                    <Link
-                                                        key={lesson.id}
-                                                        href={`/courses/${slug}/learn?lesson=${lesson.id}`}
-                                                        className="block text-inherit no-underline"
-                                                    >
-                                                        <div className="p-3 pl-6 flex justify-between items-center text-sm text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer group">
-                                                            <div className="flex items-center gap-2 group-hover:text-brand-blue">
-                                                                <span className="opacity-70">{
-                                                                    lesson.lesson_type === 'video' ? '🎥' :
-                                                                        lesson.lesson_type === 'quiz' ? '❓' :
-                                                                            lesson.lesson_type === 'pdf' ? '📄' : '📄'
-                                                                }</span>
-                                                                <span>{lesson.title}</span>
-                                                            </div>
-                                                            {lesson.is_free_preview && (
-                                                                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Preview</span>
-                                                            )}
-                                                            <span className="text-slate-300 group-hover:text-slate-500 opacity-0 group-hover:opacity-100 transition-all font-bold">
-                                                                →
-                                                            </span>
-                                                        </div>
-                                                    </Link>
-                                                ))}
-                                                {mod.lessons.length === 0 && (
-                                                    <div className="p-3 pl-6 text-sm text-slate-400 italic">No lessons yet</div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-slate-500 italic">Curriculum coming soon.</p>
-                                )}
-                            </div>
+                            <CurriculumList
+                                modules={course.modules}
+                                visibleModules={visibleModules}
+                                showFullCurriculum={showFullCurriculum}
+                                isAdmin={isAdmin}
+                                isEnrolled={isEnrolled}
+                                slug={slug}
+                            />
                         </div>
                     </div>
 
@@ -285,6 +267,6 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
