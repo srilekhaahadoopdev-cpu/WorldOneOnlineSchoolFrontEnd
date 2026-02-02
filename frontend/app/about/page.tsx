@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import PhilosophySection from "@/components/AboutUs/PhilosophySection";
-import ValuesSection from "@/components/AboutUs/ValuesSection";
-import MeetTheTeam from "@/components/AboutUs/MeetTheTeam";
-import SuccessStories from "@/components/AboutUs/SuccessStories";
+import PhilosophySection from "../../components/AboutUs/PhilosophySection";
+import ValuesSection from "../../components/AboutUs/ValuesSection";
+import MeetTheTeam from "../../components/AboutUs/MeetTheTeam";
+import SuccessStories from "../../components/AboutUs/SuccessStories";
 
 export const metadata = {
     title: "About Us | World One Online School",
