@@ -40,11 +40,14 @@ interface CourseWithContent extends Course {
 
 export const revalidate = 0; // Ensure dynamic data fetch to reflect updates immediately
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || (
-    process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}/api/v1`
-        : 'http://127.0.0.1:8002/api/v1'
-);
+const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api/v1`;
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/v1`;
+    return 'http://127.0.0.1:8002/api/v1';
+};
+
+const API_URL = getBaseUrl();
 
 import { createClient } from '@/lib/supabase/server';
 
