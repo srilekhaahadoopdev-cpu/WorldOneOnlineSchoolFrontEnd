@@ -73,6 +73,12 @@ const getBaseUrl = async () => {
         console.warn("Failed to determine host from headers:", e);
     }
 
+    // Hardcoded fallback for production to ensure it works even if env vars fail
+    if (process.env.NODE_ENV === 'production') {
+        console.log("Using Hardcoded Production URL");
+        return 'https://world-one-online-school-front-end.vercel.app/api/v1';
+    }
+
     console.log("Falling back to localhost (dev mode)");
     return 'http://127.0.0.1:8002/api/v1';
 };
