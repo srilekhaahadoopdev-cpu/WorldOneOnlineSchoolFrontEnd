@@ -49,16 +49,10 @@ const getBaseUrl = async () => {
         return process.env.NEXT_PUBLIC_API_URL;
     }
 
-    try {
-        const headersList = await headers();
-        const host = headersList.get('host');
-        const proto = headersList.get('x-forwarded-proto') || 'https';
-        console.log("Headers detected host:", host, "proto:", proto);
-        if (host) {
-            return `${proto}://${host}/api/v1`;
-        }
-    } catch (e) {
-        console.warn("Failed to determine host from headers:", e);
+    // System env var for Vercel URL (often available)
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        console.log("Using NEXT_PUBLIC_VERCEL_URL:", process.env.NEXT_PUBLIC_VERCEL_URL);
+        return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/v1`;
     }
 
     if (process.env.VERCEL_URL) {
@@ -66,7 +60,20 @@ const getBaseUrl = async () => {
         return `https://${process.env.VERCEL_URL}/api/v1`;
     }
 
-    console.log("Falling back to localhost");
+    // Try headers as last resort for dynamic host detection
+    try {
+        const headersList = await headers();
+        const host = headersList.get('host');
+        const proto = headersList.get('x-forwarded-proto') || 'https';
+        if (host) {
+            console.log("Using headers host:", host);
+            return `${proto}://${host}/api/v1`;
+        }
+    } catch (e) {
+        console.warn("Failed to determine host from headers:", e);
+    }
+
+    console.log("Falling back to localhost (dev mode)");
     return 'http://127.0.0.1:8002/api/v1';
 };
 // Note: API_URL is now a Promise or must be awaited.
