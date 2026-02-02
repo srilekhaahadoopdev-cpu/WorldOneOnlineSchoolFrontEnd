@@ -54,8 +54,8 @@ export default function AdminDashboard() {
                     fetch(`${API_URL}/analytics/admin`)
                 ]);
 
-                if (coursesRes.ok) setCourses(await coursesRes.json());
-                if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
+                if (coursesRes.ok) setCourses(await coursesRes.json() as Course[]);
+                if (analyticsRes.ok) setAnalytics(await analyticsRes.json() as Analytics);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
             } finally {
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                         <XAxis type="number" hide />
                                         <YAxis dataKey="title" type="category" width={150} tick={{ fontSize: 12 }} />
-                                        <Tooltip formatter={(value: number) => [`$${value}`, 'Revenue']} />
+                                        <Tooltip formatter={(value?: number) => [`$${value || 0}`, 'Revenue']} />
                                         <Bar dataKey="revenue" radius={[0, 4, 4, 0]} barSize={32}>
                                             {analytics.top_courses.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {courses.map((course: any) => (
+                                    {courses.map((course) => (
                                         <tr key={course.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-6 py-4 font-medium text-deep-navy">
                                                 <div className="flex items-center gap-3">

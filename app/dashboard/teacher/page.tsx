@@ -22,7 +22,7 @@ export default function TeacherDashboard() {
             try {
                 const res = await fetch(`${API_URL}/courses`);
                 if (res.ok) {
-                    setCourses(await res.json());
+                    setCourses(await res.json() as Course[]);
                 }
             } catch (error) {
                 console.error(error);

@@ -24,6 +24,14 @@ interface Module {
     order: number;
 }
 
+interface Course {
+    id: string;
+    title: string;
+    description?: string;
+    is_published: boolean;
+    // Add other fields as needed
+}
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -38,7 +46,7 @@ export default function CourseEditPage({ params }: { params: Promise<{ id: strin
     const [isFetching, setIsFetching] = useState(true);
     const [activeModuleId, setActiveModuleId] = useState<string | null>(null); // For Add modal
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null); // For Edit modal
-    const [course, setCourse] = useState<any>(null); // Store course details
+    const [course, setCourse] = useState<Course | null>(null); // Store course details
 
     // Fetch Modules
     useEffect(() => {
@@ -111,7 +119,7 @@ export default function CourseEditPage({ params }: { params: Promise<{ id: strin
         }
     };
 
-    const handleLessonAdded = (lesson: any) => {
+    const handleLessonAdded = (lesson: Lesson) => {
         const moduleId = lesson.module_id;
         setLessonsByModule(prev => ({
             ...prev,

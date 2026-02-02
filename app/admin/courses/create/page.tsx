@@ -60,9 +60,13 @@ export default function CreateCoursePage() {
             // const data = await res.json();
             router.push('/admin');
             router.refresh(); // Refresh server components
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            alert(`Error: ${error.message}`);
+            if (error instanceof Error) {
+                alert(`Error: ${error.message}`);
+            } else {
+                alert('An unknown error occurred');
+            }
         } finally {
             setIsLoading(false);
         }

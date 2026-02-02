@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { User } from '@supabase/supabase-js';
 
 interface Course {
     id: string;
@@ -28,9 +29,17 @@ interface Progress {
     total_lessons: number;
 }
 
+
+interface Profile {
+    id: string;
+    full_name: string | null;
+    role: string | null;
+    email?: string;
+}
+
 export default function DashboardPage() {
-    const [user, setUser] = useState<any>(null);
-    const [profile, setProfile] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
     const [progress, setProgress] = useState<Record<string, Progress>>({});
     const [loading, setLoading] = useState(true);
@@ -50,7 +59,7 @@ export default function DashboardPage() {
                     .select('*')
                     .eq('id', user.id)
                     .single();
-                setProfile(profile);
+                setProfile(profile as Profile);
 
                 // Get Enrollments with course details
                 console.log('Fetching enrollments for user:', user.id);
@@ -80,7 +89,8 @@ export default function DashboardPage() {
                 }
 
                 if (enrollmentsData) {
-                    setEnrollments(enrollmentsData as any);
+                    // Cast the data to Enrollment[] as we know the shape matches
+                    setEnrollments(enrollmentsData as unknown as Enrollment[]);
 
                     // Fetch progress for each course
                     const progressMap: Record<string, Progress> = {};

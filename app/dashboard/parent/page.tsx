@@ -12,7 +12,7 @@ interface Child {
     avatar_url?: string;
 }
 
-interface StudentCrypto {
+interface StudentAnalytics {
     courses: Array<{
         course_title: string;
         completed_lessons: number;
@@ -27,7 +27,7 @@ interface StudentCrypto {
 export default function ParentDashboard() {
     const [children, setChildren] = useState<Child[]>([]);
     const [selectedChild, setSelectedChild] = useState<Child | null>(null);
-    const [analytics, setAnalytics] = useState<StudentCrypto | null>(null);
+    const [analytics, setAnalytics] = useState<StudentAnalytics | null>(null);
     const [loading, setLoading] = useState(true);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001/api/v1';
@@ -141,7 +141,7 @@ export default function ParentDashboard() {
                                     <h3 className="font-bold text-xl text-deep-navy mb-6">Course Performance</h3>
 
                                     <div className="space-y-6">
-                                        {analytics.courses.length > 0 ? analytics.courses.map((course: any, idx: number) => {
+                                        {analytics.courses.length > 0 ? analytics.courses.map((course, idx: number) => {
                                             const progress = course.total_lessons > 0 ? Math.round((course.completed_lessons / course.total_lessons) * 100) : 0;
                                             return (
                                                 <div key={idx} className="border-b border-slate-50 last:border-0 pb-6 last:pb-0">
