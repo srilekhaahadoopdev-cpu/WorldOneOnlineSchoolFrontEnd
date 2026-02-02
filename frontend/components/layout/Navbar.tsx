@@ -161,6 +161,9 @@ export function Navbar() {
                         <Link href="/programs" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-blue hover:bg-blue-50">
                             Programs
                         </Link>
+                        <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-blue hover:bg-blue-50">
+                            About
+                        </Link>
                         {user && (
                             <Link href="/dashboard" className="block px-3 py-2 rounded-md text-base font-bold text-brand-blue hover:bg-blue-50">
                                 Dashboard
