@@ -52,6 +52,7 @@ async function getCourse(slug: string): Promise<CourseWithContent | null> {
     const cleanSlug = slug.trim();
 
     try {
+        console.log("Fetching course from URL:", `${API_URL}/courses/slug/${cleanSlug}`);
         const res = await fetch(`${API_URL}/courses/slug/${cleanSlug}`, {
             cache: 'no-store',
             next: { revalidate: 0 }
