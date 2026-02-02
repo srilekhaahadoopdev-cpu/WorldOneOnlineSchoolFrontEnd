@@ -19,7 +19,7 @@ export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonMo
         setIsLoading(true);
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/v1/lessons', {
+            const res = await fetch('http://127.0.0.1:8001/api/v1/lessons', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -71,6 +71,7 @@ export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonMo
                             <option value="text">Article / Text</option>
                             <option value="video">Video</option>
                             <option value="quiz">Quiz</option>
+                            <option value="assignment">Assignment</option>
                             <option value="pdf">PDF Resource</option>
                         </select>
                     </div>

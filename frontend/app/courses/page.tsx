@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const revalidate = 0; // Ensure dynamic data fetch
 
@@ -23,9 +24,18 @@ async function getCourses(searchQuery: string | undefined) {
 export default async function CatalogPage({
     searchParams,
 }: {
-    searchParams: { q?: string };
+    searchParams: Promise<{ q?: string }>;
 }) {
-    const courses = await getCourses(searchParams.q);
+    const { q } = await searchParams;
+
+    // Auth Check
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        redirect('/login?next=/courses');
+    }
+
+    const courses = await getCourses(q);
 
     return (
         <div className="min-h-screen bg-slate-50 py-12">
@@ -41,7 +51,7 @@ export default async function CatalogPage({
                     <form className="mt-4 md:mt-0 w-full md:w-auto">
                         <input
                             name="q"
-                            defaultValue={searchParams.q}
+                            defaultValue={q}
                             type="text"
                             placeholder="Search courses..."
                             className="w-full md:w-80 px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none"
@@ -86,7 +96,7 @@ export default async function CatalogPage({
                     </div>
                 ) : (
                     <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
-                        <h3 className="text-xl font-medium text-slate-400">No courses found matching "{searchParams.q}"</h3>
+                        <h3 className="text-xl font-medium text-slate-400">No courses found matching "{q}"</h3>
                         <Link href="/courses">
                             <Button variant="ghost" className="mt-4">Clear Search</Button>
                         </Link>

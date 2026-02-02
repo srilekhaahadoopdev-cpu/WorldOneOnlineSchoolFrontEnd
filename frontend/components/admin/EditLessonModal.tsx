@@ -36,7 +36,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
         console.log("Submitting Lesson Update:", payload);
 
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/lessons/${lesson.id}`, {
+            const res = await fetch(`http://localhost:8001/api/v1/lessons/${lesson.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -81,6 +81,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
                                 <option value="text">Article / Text</option>
                                 <option value="video">Video</option>
                                 <option value="quiz">Quiz</option>
+                                <option value="assignment">Assignment</option>
                                 <option value="pdf">PDF Resource</option>
                             </select>
                         </div>
@@ -127,7 +128,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
 
                                         try {
                                             e.target.disabled = true;
-                                            const res = await fetch('http://localhost:8000/api/v1/upload', {
+                                            const res = await fetch('http://localhost:8001/api/v1/upload', {
                                                 method: 'POST',
                                                 body: formData,
                                             });
@@ -196,7 +197,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
                                     const formData = new FormData();
                                     formData.append('file', file);
                                     try {
-                                        const res = await fetch('http://localhost:8000/api/v1/upload', { method: 'POST', body: formData });
+                                        const res = await fetch('http://localhost:8001/api/v1/upload', { method: 'POST', body: formData });
                                         if (!res.ok) {
                                             const errText = await res.text();
                                             throw new Error(`Status: ${res.status}. ${errText}`);

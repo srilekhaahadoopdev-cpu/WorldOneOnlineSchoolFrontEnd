@@ -38,11 +38,6 @@ export function Hero() {
                             Join Now
                         </Button>
                     </Link>
-                    <Link href="/courses">
-                        <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/50 backdrop-blur-sm">
-                            Explore Courses
-                        </Button>
-                    </Link>
                 </div>
             </div>
         </section>

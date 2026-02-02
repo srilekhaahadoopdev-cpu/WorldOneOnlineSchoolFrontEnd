@@ -38,7 +38,7 @@ export default function CreateCoursePage() {
         setIsLoading(true);
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001/api/v1';
             const res = await fetch(`${apiUrl}/courses`, {
                 method: 'POST',
                 headers: {
@@ -60,9 +60,13 @@ export default function CreateCoursePage() {
             // const data = await res.json();
             router.push('/admin');
             router.refresh(); // Refresh server components
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            alert(`Error: ${error.message}`);
+            if (error instanceof Error) {
+                alert(`Error: ${error.message}`);
+            } else {
+                alert('An unknown error occurred');
+            }
         } finally {
             setIsLoading(false);
         }

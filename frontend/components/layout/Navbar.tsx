@@ -5,16 +5,21 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { ShoppingCart } from 'lucide-react';
+import { useCartStore } from '@/lib/store/cart';
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
+    const { items } = useCartStore();
 
     const router = useRouter();
     const supabase = createClient();
 
     useEffect(() => {
+        setMounted(true);
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setUser(session?.user || null);
@@ -65,15 +70,26 @@ export function Navbar() {
                         <Link href="/about" className="text-slate-600 hover:text-brand-blue font-medium transition-colors">
                             About
                         </Link>
-                        {user?.email === 'admin@worldone.com' && ( // Simple admin check placeholder
+                        {user?.email === 'admin@worldone.com' && (
                             <Link href="/admin" className="text-brand-gold hover:text-yellow-600 font-bold transition-colors">
                                 Admin
                             </Link>
                         )}
                     </div>
 
-                    {/* Auth Actions */}
+                    {/* Desktop Right Section (Cart + Auth) */}
                     <div className="hidden md:flex items-center space-x-4">
+
+                        {/* Cart Icon */}
+                        {mounted && items.length > 0 && (
+                            <Link href="/checkout" className="relative p-2 text-slate-600 hover:text-brand-blue transition-colors mr-2">
+                                <ShoppingCart className="w-6 h-6" />
+                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                    {items.length}
+                                </span>
+                            </Link>
+                        )}
+
                         {loading ? (
                             <div className="h-8 w-20 bg-slate-100 animate-pulse rounded"></div>
                         ) : user ? (
@@ -105,6 +121,14 @@ export function Navbar() {
 
                     {/* Mobile menu button */}
                     <div className="md:hidden flex items-center">
+                        {mounted && items.length > 0 && (
+                            <Link href="/checkout" className="relative p-2 text-slate-600 hover:text-brand-blue transition-colors mr-4">
+                                <ShoppingCart className="w-6 h-6" />
+                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                    {items.length}
+                                </span>
+                            </Link>
+                        )}
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className="inline-flex items-center justify-center p-2 rounded-md text-slate-600 hover:text-brand-blue focus:outline-none"
