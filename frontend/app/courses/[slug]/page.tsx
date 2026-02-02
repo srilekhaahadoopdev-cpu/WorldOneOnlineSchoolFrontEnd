@@ -38,18 +38,22 @@ interface CourseWithContent extends Course {
     modules: Module[];
 }
 
-export const revalidate = 0; // Ensure dynamic data fetch to reflect updates immediately
+export const dynamic = 'force-dynamic'; // Force dynamic rendering so headers() works
+export const revalidate = 0;
 
 import { headers } from 'next/headers';
 
 const getBaseUrl = async () => {
-    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (process.env.NEXT_PUBLIC_API_URL) {
+        console.log("Using NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+        return process.env.NEXT_PUBLIC_API_URL;
+    }
 
-    // Try to construct from request headers (Robust fallback)
     try {
-        const headersList = await headers(); // await is required in Next.js 15+
+        const headersList = await headers();
         const host = headersList.get('host');
         const proto = headersList.get('x-forwarded-proto') || 'https';
+        console.log("Headers detected host:", host, "proto:", proto);
         if (host) {
             return `${proto}://${host}/api/v1`;
         }
@@ -57,7 +61,12 @@ const getBaseUrl = async () => {
         console.warn("Failed to determine host from headers:", e);
     }
 
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api/v1`;
+    if (process.env.VERCEL_URL) {
+        console.log("Using VERCEL_URL:", process.env.VERCEL_URL);
+        return `https://${process.env.VERCEL_URL}/api/v1`;
+    }
+
+    console.log("Falling back to localhost");
     return 'http://127.0.0.1:8002/api/v1';
 };
 // Note: API_URL is now a Promise or must be awaited.
