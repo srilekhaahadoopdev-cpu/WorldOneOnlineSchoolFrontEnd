@@ -40,19 +40,35 @@ interface CourseWithContent extends Course {
 
 export const revalidate = 0; // Ensure dynamic data fetch to reflect updates immediately
 
-const getBaseUrl = () => {
+import { headers } from 'next/headers';
+
+const getBaseUrl = async () => {
     if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+
+    // Try to construct from request headers (Robust fallback)
+    try {
+        const headersList = await headers(); // await is required in Next.js 15+
+        const host = headersList.get('host');
+        const proto = headersList.get('x-forwarded-proto') || 'https';
+        if (host) {
+            return `${proto}://${host}/api/v1`;
+        }
+    } catch (e) {
+        console.warn("Failed to determine host from headers:", e);
+    }
+
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api/v1`;
-    if (process.env.NEXT_PUBLIC_VERCEL_URL) return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/v1`;
     return 'http://127.0.0.1:8002/api/v1';
 };
-
-const API_URL = getBaseUrl();
+// Note: API_URL is now a Promise or must be awaited.
+// But we can't make the top-level const async.
+// We will call getBaseUrl() inside the function.
 
 import { createClient } from '@/lib/supabase/server';
 
 async function getCourse(slug: string): Promise<CourseWithContent | null> {
     const cleanSlug = slug.trim();
+    const API_URL = await getBaseUrl();
 
     try {
         console.log("Fetching course from URL:", `${API_URL}/courses/slug/${cleanSlug}`);
