@@ -10,7 +10,19 @@ interface EditLessonModalProps {
 }
 
 export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLessonModalProps) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+    // Robust API URL detection
+    const getApiUrl = () => {
+        const envUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (typeof window !== 'undefined') {
+            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                if (envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
+                    return '/api/v1';
+                }
+            }
+        }
+        return envUrl || '/api/v1';
+    };
+    const API_URL = getApiUrl();
     const [title, setTitle] = useState(lesson.title);
     const [type, setType] = useState(lesson.lesson_type);
     const [content, setContent] = useState(lesson.content || '');
