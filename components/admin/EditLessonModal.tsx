@@ -10,6 +10,7 @@ interface EditLessonModalProps {
 }
 
 export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLessonModalProps) {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
     const [title, setTitle] = useState(lesson.title);
     const [type, setType] = useState(lesson.lesson_type);
     const [content, setContent] = useState(lesson.content || '');
@@ -36,7 +37,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
         console.log("Submitting Lesson Update:", payload);
 
         try {
-            const res = await fetch(`http://localhost:8001/api/v1/lessons/${lesson.id}`, {
+            const res = await fetch(`${API_URL}/lessons/${lesson.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -46,9 +47,9 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
             const data = await res.json();
             onLessonUpdated(data);
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Failed to update lesson");
+            alert(`Error updating lesson (${API_URL}): ${error.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -128,7 +129,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
 
                                         try {
                                             e.target.disabled = true;
-                                            const res = await fetch('http://localhost:8001/api/v1/upload', {
+                                            const res = await fetch(`${API_URL}/upload`, {
                                                 method: 'POST',
                                                 body: formData,
                                             });
@@ -197,7 +198,7 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
                                     const formData = new FormData();
                                     formData.append('file', file);
                                     try {
-                                        const res = await fetch('http://localhost:8001/api/v1/upload', { method: 'POST', body: formData });
+                                        const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
                                         if (!res.ok) {
                                             const errText = await res.text();
                                             throw new Error(`Status: ${res.status}. ${errText}`);

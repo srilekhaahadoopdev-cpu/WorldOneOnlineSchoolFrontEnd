@@ -167,7 +167,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             if (!user) return;
 
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api/v1'}/courses/${course.id}/progress/${user.id}`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1'}/courses/${course.id}/progress/${user.id}`);
                 if (res.ok) {
                     const data = await res.json();
                     const newProgress: Record<string, boolean> = {};
@@ -194,7 +194,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         setProgress(prev => ({ ...prev, [activeLesson.id]: isComplete }));
 
         try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api/v1'}/progress/update`, {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1'}/progress/update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -38,16 +38,66 @@ interface CourseWithContent extends Course {
     modules: Module[];
 }
 
-export const revalidate = 0; // Ensure dynamic data fetch to reflect updates immediately
+export const dynamic = 'force-dynamic'; // Force dynamic rendering so headers() works
+export const revalidate = 0;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001/api/v1';
+import { headers } from 'next/headers';
+
+const getBaseUrl = async () => {
+    if (process.env.NEXT_PUBLIC_API_URL) {
+        console.log("Using NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+        return process.env.NEXT_PUBLIC_API_URL;
+    }
+
+    // System env var for Vercel URL (often available)
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        console.log("Using NEXT_PUBLIC_VERCEL_URL:", process.env.NEXT_PUBLIC_VERCEL_URL);
+        return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/v1`;
+    }
+
+    if (process.env.VERCEL_URL) {
+        console.log("Using VERCEL_URL:", process.env.VERCEL_URL);
+        return `https://${process.env.VERCEL_URL}/api/v1`;
+    }
+
+    // Try headers as last resort for dynamic host detection
+    try {
+        const headersList = await headers();
+        const host = headersList.get('host');
+        const proto = headersList.get('x-forwarded-proto') || 'https';
+        if (host) {
+            console.log("Using headers host:", host);
+            return `${proto}://${host}/api/v1`;
+        }
+    } catch (e) {
+        console.warn("Failed to determine host from headers:", e);
+    }
+
+    // Hardcoded fallback for production to ensure it works even if env vars fail
+    if (process.env.NODE_ENV === 'production') {
+        // Fallback for when we need to debug production on local or similar.
+        // Ideally Vercel env var catches this, but if not:
+        console.log("Using Hardcoded Production URL Fallback (Check Vercel Env Vars)");
+        // If your backend is NOT on Vercel, this must be the real backend URL.
+        // If your backend IS on Vercel, use relative path (though this is server-side fetch).
+        return 'http://127.0.0.1:8002/api/v1';
+    }
+
+    console.log("Falling back to localhost (dev mode)");
+    return 'http://127.0.0.1:8002/api/v1';
+};
+// Note: API_URL is now a Promise or must be awaited.
+// But we can't make the top-level const async.
+// We will call getBaseUrl() inside the function.
 
 import { createClient } from '@/lib/supabase/server';
 
 async function getCourse(slug: string): Promise<CourseWithContent | null> {
     const cleanSlug = slug.trim();
+    const API_URL = await getBaseUrl();
 
     try {
+        console.log("Fetching course from URL:", `${API_URL}/courses/slug/${cleanSlug}`);
         const res = await fetch(`${API_URL}/courses/slug/${cleanSlug}`, {
             cache: 'no-store',
             next: { revalidate: 0 }

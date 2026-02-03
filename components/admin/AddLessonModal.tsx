@@ -10,6 +10,7 @@ interface AddLessonModalProps {
 }
 
 export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonModalProps) {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
     const [title, setTitle] = useState('');
     const [type, setType] = useState('text');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,7 @@ export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonMo
         setIsLoading(true);
 
         try {
-            const res = await fetch('http://127.0.0.1:8001/api/v1/lessons', {
+            const res = await fetch(`${API_URL}/lessons`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -38,9 +39,9 @@ export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonMo
             const data = await res.json();
             onLessonAdded(data);
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Failed to create lesson");
+            alert(`Error creating lesson (${API_URL}): ${error.message}`);
         } finally {
             setIsLoading(false);
         }

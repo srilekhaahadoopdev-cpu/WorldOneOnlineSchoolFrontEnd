@@ -33,7 +33,7 @@ interface Course {
 }
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
 
 export default function CourseEditPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: courseId } = use(params);
