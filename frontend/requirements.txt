@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+pydantic[email]
+python-multipart
+httpx
+stripe
+slowapi
+reportlab
