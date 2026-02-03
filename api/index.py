@@ -4,7 +4,7 @@ import os
 
 # Add the project root to sys.path so we can import packages (like backend)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(current_dir, '..', '..')  # Go up TWO levels: api -> frontend -> root
+parent_dir = os.path.join(current_dir, '..')
 sys.path.append(parent_dir)
 
 # Now we can import the app from backend.main
