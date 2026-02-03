@@ -51,7 +51,7 @@ export default function QuizRunner({ lessonId, onComplete }: QuizRunnerProps) {
     const [isRetaking, setIsRetaking] = useState(false);
     const [bestScore, setBestScore] = useState<Attempt | null>(null);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api/v1';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
 
     useEffect(() => {
         let isMounted = true;
