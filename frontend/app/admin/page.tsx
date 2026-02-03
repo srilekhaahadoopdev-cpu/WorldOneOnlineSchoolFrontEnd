@@ -39,7 +39,7 @@ interface Analytics {
     }>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8002/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 export default function AdminDashboard() {
     const [courses, setCourses] = useState<Course[]>([]);

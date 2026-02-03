@@ -16,7 +16,7 @@ export default function AssignmentUpload({ lessonId }: AssignmentUploadProps) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
     useEffect(() => {
         const fetchAssignment = async () => {

@@ -10,7 +10,7 @@ interface AddLessonModalProps {
 }
 
 export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonModalProps) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
     const [title, setTitle] = useState('');
     const [type, setType] = useState('text');
     const [isLoading, setIsLoading] = useState(false);

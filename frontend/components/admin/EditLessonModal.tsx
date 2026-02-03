@@ -10,7 +10,7 @@ interface EditLessonModalProps {
 }
 
 export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLessonModalProps) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
     const [title, setTitle] = useState(lesson.title);
     const [type, setType] = useState(lesson.lesson_type);
     const [content, setContent] = useState(lesson.content || '');
