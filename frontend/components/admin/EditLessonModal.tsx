@@ -47,9 +47,9 @@ export function EditLessonModal({ lesson, onClose, onLessonUpdated }: EditLesson
             const data = await res.json();
             onLessonUpdated(data);
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Failed to update lesson");
+            alert(`Error updating lesson (${API_URL}): ${error.message}`);
         } finally {
             setIsLoading(false);
         }

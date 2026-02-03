@@ -39,9 +39,9 @@ export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonMo
             const data = await res.json();
             onLessonAdded(data);
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Failed to create lesson");
+            alert(`Error creating lesson (${API_URL}): ${error.message}`);
         } finally {
             setIsLoading(false);
         }
