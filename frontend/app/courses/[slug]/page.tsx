@@ -75,8 +75,12 @@ const getBaseUrl = async () => {
 
     // Hardcoded fallback for production to ensure it works even if env vars fail
     if (process.env.NODE_ENV === 'production') {
-        console.log("Using Hardcoded Production URL");
-        return 'https://world-one-online-school-front-end.vercel.app/api/v1';
+        // Fallback for when we need to debug production on local or similar.
+        // Ideally Vercel env var catches this, but if not:
+        console.log("Using Hardcoded Production URL Fallback (Check Vercel Env Vars)");
+        // If your backend is NOT on Vercel, this must be the real backend URL.
+        // If your backend IS on Vercel, use relative path (though this is server-side fetch).
+        return 'http://127.0.0.1:8002/api/v1';
     }
 
     console.log("Falling back to localhost (dev mode)");
