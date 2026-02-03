@@ -10,22 +10,7 @@ interface AddLessonModalProps {
 }
 
 export function AddLessonModal({ moduleId, onClose, onLessonAdded }: AddLessonModalProps) {
-    // Robust API URL detection
-    const getApiUrl = () => {
-        const envUrl = process.env.NEXT_PUBLIC_API_URL;
-        // If we are in the browser (client-side)
-        if (typeof window !== 'undefined') {
-            // If we are NOT on localhost...
-            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-                // ...but the ENV VAR is set to localhost, ignore it and use relative path
-                if (envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
-                    return '/api/v1';
-                }
-            }
-        }
-        return envUrl || '/api/v1';
-    };
-    const API_URL = getApiUrl();
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1';
     const [title, setTitle] = useState('');
     const [type, setType] = useState('text');
     const [isLoading, setIsLoading] = useState(false);
